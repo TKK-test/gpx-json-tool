@@ -48,38 +48,20 @@ h2 {
     line-height: 1.8;
 }
 
-.tabs,
-.subtabs,
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-
 .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
     margin-bottom: 20px;
-}
-
-.subtabs {
-    margin-bottom: 20px;
-}
-
-.tab,
-.subtab,
-button,
-.file-label {
-    border-radius: 9px;
-    padding: 10px 16px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    border: 0;
 }
 
 .tab {
-    background: #e8edf3;
+    border: 0;
     padding: 12px 22px;
+    border-radius: 9px;
+    cursor: pointer;
+    background: #e8edf3;
+    font-weight: bold;
 }
 
 .tab.active {
@@ -87,9 +69,27 @@ button,
     color: white;
 }
 
+.panel {
+    display: none;
+}
+
+.panel.active {
+    display: block;
+}
+
+.subtabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
 .subtab {
     border: 1px solid #ccd3da;
     background: white;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .subtab.active {
@@ -97,12 +97,10 @@ button,
     color: white;
 }
 
-.panel,
 .subpanel {
     display: none;
 }
 
-.panel.active,
 .subpanel.active {
     display: block;
 }
@@ -137,6 +135,24 @@ input[type="text"] {
 
 input[type="number"] {
     width: 130px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+button,
+.file-label {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .file-label {
@@ -301,35 +317,13 @@ table input[type="text"] {
     font-weight: bold;
 }
 
-.speed-info {
-    color: #666;
-    font-size: 13px;
-}
-
-.group-input-area {
+.hint {
+    padding: 12px;
     background: #fff8e8;
-    border: 1px solid #f0d28a;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.group-input-area label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.group-input-area input {
-    width: 100%;
-    max-width: 500px;
-}
-
-.format-box {
-    margin-top: 15px;
-    padding: 14px;
-    background: #f7f8fa;
-    border-radius: 9px;
-    border-left: 4px solid #1769e0;
+    border-left: 4px solid #d97706;
+    border-radius: 6px;
+    margin-top: 12px;
+    line-height: 1.7;
 }
 
 @media(max-width:700px) {
@@ -343,31 +337,16 @@ table input[type="text"] {
         padding: 15px;
     }
 
-    .toolbar {
-        align-items: stretch;
-    }
-
-    .toolbar button,
-    .toolbar .file-label {
-        width: 100%;
-        text-align: center;
-    }
-
     .inline-field {
         width: 100%;
     }
 
     .inline-field input {
         flex: 1;
-        width: auto;
     }
 
     table {
         min-width: 650px;
-    }
-
-    .group-input-area input {
-        max-width: none;
     }
 }
 </style>
@@ -387,39 +366,24 @@ table input[type="text"] {
 支援 GPX 與 JSON 雙向解析、編輯與輸出。
 </p>
 
-<div class="format-box">
-
-<strong>JSON TXT 支援格式：</strong>
-
-<pre>
-① ### 群組
-
-### 福岡背景
+<div class="example">### 福岡背景
 33.884982,130.876213,福岡背景1
 33.890528,130.884609,福岡背景2
 33.871791,130.807495
 
-
-② 名稱 + 座標
-
-高知空港
-33.54744,133.67392
-
-松山空港
-33.82935,132.70434
-
-
-③ 座標,名稱
-
-33.884982,130.876213,福岡背景1
-33.890528,130.884609,福岡背景2
-33.871791,130.807495
-</pre>
-
-</div>
+### 沖繩背景
+26.21641,127.68942
+26.2813918,127.7322148,沖繩特殊點
+26.32766,127.803001</div>
 
 <p class="small">
-沒有第三欄名稱時，自動使用「群組名稱 + 編號」。
+JSON/TXT 支援三種格式：
+<br>
+① <code>### 群組</code> + <code>緯度,經度,名稱</code>
+<br>
+② <code>### 群組</code> + <code>緯度,經度</code>
+<br>
+③ 無 <code>###</code> 時：<code>名稱</code> 下一行接 <code>緯度,經度</code>
 </p>
 
 </div>
@@ -443,7 +407,7 @@ table input[type="text"] {
 
 
 <!-- =====================================================
-     GPX
+     GPX PANEL
 ===================================================== -->
 
 <div class="panel active" id="gpxPanel">
@@ -461,22 +425,30 @@ GPX → 編輯 → GPX
 </div>
 
 
-<!-- GPX TXT -->
+<!-- ================= TXT → GPX ================= -->
 
 <div class="subpanel active" id="gpxTxtPanel">
 
 <h2>TXT → GPX</h2>
 
 <p class="small">
-格式：緯度,經度<br>
-第三欄如果存在會忽略，GPX 名稱統一使用下方路徑名稱。
+格式：
+<br>
+緯度,經度
+<br>
+緯度,經度,名稱
+<br>
+第三欄名稱可忽略，GPX 名稱統一使用下方路徑名稱。
 </p>
 
 <div class="toolbar">
 
 <label class="file-label">
 📂 上傳 TXT
-<input type="file" id="gpxTxtFile" accept=".txt,text/plain">
+<input
+type="file"
+id="gpxTxtFile"
+accept=".txt,text/plain">
 </label>
 
 <button class="btn-secondary" id="gpxTxtClear">
@@ -498,8 +470,6 @@ value="itools_route">
 
 <div class="section">
 
-<label>座標：</label>
-
 <textarea
 id="gpxTxtInput"
 placeholder="33.884982,130.876213
@@ -510,38 +480,51 @@ placeholder="33.884982,130.876213
 <div class="toolbar">
 
 <div class="inline-field">
+
 <label>速度</label>
+
 <input
 type="number"
-id="gpxTxtSpeed"
+id="gpxTxtSpeedKmh"
 value="8.64"
 step="0.01"
 min="0">
+
 <span>km/h</span>
+
 </div>
 
 <div class="inline-field">
+
 <label>Loop</label>
+
 <input
 type="number"
 id="gpxTxtLoop"
 value="0">
+
 </div>
 
 <div class="inline-field">
+
 <label>檔名</label>
+
 <input
 type="text"
 id="gpxTxtFilename"
 value="itools_route">
-</div>
 
 </div>
 
-<div class="speed-info">
-iTools Speed 換算：km/h ÷ 0.072。
-例如 8.64 km/h → speed="120.0"
 </div>
+
+<p class="small">
+速度換算：
+<br>
+GPX speed = km/h ÷ 0.072
+<br>
+預設 8.64 km/h → speed="120.0"
+</p>
 
 <div class="toolbar">
 
@@ -549,33 +532,43 @@ iTools Speed 換算：km/h ÷ 0.072。
 🚀 生成 GPX
 </button>
 
-<button class="btn-success" id="gpxTxtDownload" disabled>
+<button
+class="btn-success"
+id="gpxTxtDownload"
+disabled>
 ⬇️ 下載 GPX
 </button>
 
-<button class="btn-secondary" id="gpxTxtCopy" disabled>
+<button
+class="btn-secondary"
+id="gpxTxtCopy"
+disabled>
 📋 複製
 </button>
 
 </div>
 
-<div class="status" id="gpxTxtStatus">
+<div
+class="status"
+id="gpxTxtStatus">
 尚未生成
 </div>
 
-<pre class="output" id="gpxTxtOutput">尚無輸出</pre>
+<pre
+class="output"
+id="gpxTxtOutput">尚無輸出</pre>
 
 </div>
 
 
-<!-- GPX EDIT -->
+<!-- ================= GPX EDIT ================= -->
 
 <div class="subpanel" id="gpxEditPanel">
 
 <h2>GPX → 編輯 → GPX</h2>
 
 <p class="small">
-可以直接上傳 GPX，或貼上完整 GPX XML。
+可以上傳 GPX，或貼上完整 GPX XML。
 解析後可以修改名稱、緯度、經度、速度、Loop。
 </p>
 
@@ -589,11 +582,15 @@ id="gpxEditFile"
 accept=".gpx,.xml,application/gpx+xml,text/xml">
 </label>
 
-<button class="btn-dark" id="gpxParseButton">
+<button
+class="btn-dark"
+id="gpxParseButton">
 🔄 解析 GPX
 </button>
 
-<button class="btn-secondary" id="gpxEditClear">
+<button
+class="btn-secondary"
+id="gpxEditClear">
 清除
 </button>
 
@@ -610,77 +607,103 @@ placeholder="將 GPX XML 貼在這裡..."></textarea>
 <div class="toolbar">
 
 <div class="inline-field">
+
 <label>速度</label>
+
 <input
 type="number"
-id="gpxEditSpeed"
+id="gpxEditSpeedKmh"
 value="8.64"
 step="0.01"
 min="0">
+
 <span>km/h</span>
+
 </div>
 
 <div class="inline-field">
+
 <label>Loop</label>
+
 <input
 type="number"
 id="gpxEditLoop"
 value="0">
+
 </div>
 
 <div class="inline-field">
+
 <label>下載檔名</label>
+
 <input
 type="text"
 id="gpxEditFilename"
 value="edited_route">
-</div>
 
 </div>
 
-<div class="speed-info">
-讀取 GPX 時會自動將 iTools Speed 轉回 km/h。
 </div>
 
 <div class="toolbar">
 
-<button class="btn-primary" id="gpxAddPoint">
+<button
+class="btn-primary"
+id="gpxAddPoint">
 ➕ 新增座標
 </button>
 
-<span class="point-count" id="gpxPointCount">
+<span
+class="point-count"
+id="gpxPointCount">
 0 個座標
 </span>
 
 </div>
 
-<div class="section" id="gpxEditTable">
+<div
+class="section"
+id="gpxEditTable">
+
 <div class="empty">
 尚未解析 GPX
 </div>
+
 </div>
 
 <div class="toolbar">
 
-<button class="btn-primary" id="gpxEditGenerate">
+<button
+class="btn-primary"
+id="gpxEditGenerate">
 🚀 生成 GPX
 </button>
 
-<button class="btn-success" id="gpxEditDownload" disabled>
+<button
+class="btn-success"
+id="gpxEditDownload"
+disabled>
 ⬇️ 下載 GPX
 </button>
 
-<button class="btn-secondary" id="gpxEditCopy" disabled>
+<button
+class="btn-secondary"
+id="gpxEditCopy"
+disabled>
 📋 複製
 </button>
 
 </div>
 
-<div class="status" id="gpxEditStatus">
+<div
+class="status"
+id="gpxEditStatus">
 尚未解析
 </div>
 
-<pre class="output" id="gpxEditOutput">尚無輸出</pre>
+<pre
+class="output"
+id="gpxEditOutput">尚無輸出</pre>
 
 </div>
 
@@ -688,63 +711,110 @@ value="edited_route">
 
 
 <!-- =====================================================
-     JSON
+     JSON PANEL
 ===================================================== -->
 
 <div class="panel" id="jsonPanel">
 
 <div class="subtabs">
 
-<button class="subtab active" data-sub="jsonTxtPanel">
+<button
+class="subtab active"
+data-sub="jsonTxtPanel">
 TXT → JSON
 </button>
 
-<button class="subtab" data-sub="jsonEditPanel">
+<button
+class="subtab"
+data-sub="jsonEditPanel">
 JSON → 編輯 → JSON
 </button>
 
 </div>
 
 
-<!-- JSON TXT -->
+<!-- ================= TXT → JSON ================= -->
 
 <div class="subpanel active" id="jsonTxtPanel">
 
 <h2>TXT → JSON</h2>
 
-<p class="small">
-支援三種 TXT 格式。
-</p>
+<div class="hint">
+
+<b>TXT 格式判定方式</b>
+
+<br><br>
+
+<b>格式 1：</b>
+
+<pre>### 九州空港
+33.58443,130.44411,福岡空港
+33.15362,130.30363,佐賀空港</pre>
+
+<b>格式 2：</b>
+
+<pre>### 九州空港
+33.58443,130.44411
+33.15362,130.30363</pre>
+
+沒有名稱時：
+
+<pre>九州空港1
+九州空港2</pre>
+
+<br>
+
+<b>格式 3：</b>
+
+<pre>高知空港
+33.54744,133.67392
+
+松山空港
+33.82935,132.70434
+
+高松空港
+34.21892,134.01868</pre>
+
+這種格式不需要 <code>###</code>。
+
+名稱會套用到下一行座標。
+
+</div>
+
 
 <div class="toolbar">
 
 <label class="file-label">
+
 📂 上傳 TXT
-<input type="file" id="jsonTxtFile" accept=".txt,text/plain">
+
+<input
+type="file"
+id="jsonTxtFile"
+accept=".txt,text/plain">
+
 </label>
 
-<button class="btn-secondary" id="jsonTxtClear">
+<button
+class="btn-secondary"
+id="jsonTxtClear">
 清除
 </button>
 
 </div>
 
 
-<div class="section group-input-area">
+<div class="section">
 
 <label>
-沒有 ### 群組時的群組名稱
+<b>無 ### 時的群組名稱：</b>
 </label>
 
 <input
 type="text"
-id="jsonDefaultGroup"
-placeholder="例如：日本空港（空白則使用 Default）">
-
-<div class="small">
-有 <strong>### 群組</strong> 時，優先使用 ### 後面的名稱。
-沒有 ### 時，所有座標會放入這裡指定的群組。
-</div>
+id="jsonTxtDefaultGroup"
+value="Default"
+placeholder="未輸入則使用 Default">
 
 </div>
 
@@ -753,52 +823,56 @@ placeholder="例如：日本空港（空白則使用 Default）">
 
 <textarea
 id="jsonTxtInput"
-placeholder="### 福岡背景
-33.884982,130.876213,福岡背景1
-33.890528,130.884609,福岡背景2
-33.871791,130.807495
-
-或：
-
-高知空港
+placeholder="高知空港
 33.54744,133.67392
 
 松山空港
 33.82935,132.70434
 
-或：
-
-33.884982,130.876213,福岡背景1
-33.890528,130.884609,福岡背景2"></textarea>
+高松空港
+34.21892,134.01868"></textarea>
 
 </div>
 
 
 <div class="toolbar">
 
-<button class="btn-primary" id="jsonTxtParse">
+<button
+class="btn-primary"
+id="jsonTxtParse">
 🔄 分析 TXT
 </button>
 
-<button class="btn-warning" id="jsonAutoName">
+<button
+class="btn-warning"
+id="jsonAutoName">
 🔄 全部使用群組編號
 </button>
 
-<button class="btn-secondary" id="jsonAddGroup">
+<button
+class="btn-secondary"
+id="jsonAddGroup">
 📁 新增群組
 </button>
 
-<button class="btn-secondary" id="jsonAddPoint">
+<button
+class="btn-secondary"
+id="jsonAddPoint">
 ➕ 新增座標
 </button>
 
-<span class="point-count" id="jsonTxtCount">
+<span
+class="point-count"
+id="jsonTxtCount">
 0 個座標
 </span>
 
 </div>
 
-<div class="section" id="jsonTxtTable">
+
+<div
+class="section"
+id="jsonTxtTable">
 
 <div class="empty">
 尚未分析 TXT
@@ -806,34 +880,50 @@ placeholder="### 福岡背景
 
 </div>
 
+
 <div class="toolbar">
 
-<button class="btn-primary" id="jsonTxtGenerate">
+<button
+class="btn-primary"
+id="jsonTxtGenerate">
 🚀 生成 JSON
 </button>
 
-<button class="btn-success" id="jsonTxtDownload" disabled>
+<button
+class="btn-success"
+id="jsonTxtDownload"
+disabled>
 ⬇️ 下載 JSON
 </button>
 
-<button class="btn-secondary" id="jsonTxtCopy" disabled>
+<button
+class="btn-secondary"
+id="jsonTxtCopy"
+disabled>
 📋 複製
 </button>
 
 </div>
 
-<div class="status" id="jsonTxtStatus">
+
+<div
+class="status"
+id="jsonTxtStatus">
 尚未分析
 </div>
 
-<pre class="output" id="jsonTxtOutput">尚無輸出</pre>
+<pre
+class="output"
+id="jsonTxtOutput">尚無輸出</pre>
 
 </div>
 
 
-<!-- JSON EDIT -->
+<!-- ================= JSON EDIT ================= -->
 
-<div class="subpanel" id="jsonEditPanel">
+<div
+class="subpanel"
+id="jsonEditPanel">
 
 <h2>JSON → 編輯 → JSON</h2>
 
@@ -844,19 +934,30 @@ placeholder="### 福岡背景
 <div class="toolbar">
 
 <label class="file-label">
+
 📂 上傳 JSON
-<input type="file" id="jsonEditFile" accept=".json,application/json">
+
+<input
+type="file"
+id="jsonEditFile"
+accept=".json,application/json">
+
 </label>
 
-<button class="btn-dark" id="jsonParseButton">
+<button
+class="btn-dark"
+id="jsonParseButton">
 🔄 解析 JSON
 </button>
 
-<button class="btn-secondary" id="jsonEditClear">
+<button
+class="btn-secondary"
+id="jsonEditClear">
 清除
 </button>
 
 </div>
+
 
 <div class="section">
 
@@ -874,27 +975,39 @@ placeholder='{
 
 </div>
 
+
 <div class="toolbar">
 
-<button class="btn-secondary" id="jsonEditAddGroup">
+<button
+class="btn-secondary"
+id="jsonEditAddGroup">
 📁 新增群組
 </button>
 
-<button class="btn-secondary" id="jsonEditAddPoint">
+<button
+class="btn-secondary"
+id="jsonEditAddPoint">
 ➕ 新增座標
 </button>
 
-<button class="btn-warning" id="jsonEditAutoName">
+<button
+class="btn-warning"
+id="jsonEditAutoName">
 🔄 全部使用群組編號
 </button>
 
-<span class="point-count" id="jsonEditCount">
+<span
+class="point-count"
+id="jsonEditCount">
 0 個座標
 </span>
 
 </div>
 
-<div class="section" id="jsonEditTable">
+
+<div
+class="section"
+id="jsonEditTable">
 
 <div class="empty">
 尚未解析 JSON
@@ -902,27 +1015,41 @@ placeholder='{
 
 </div>
 
+
 <div class="toolbar">
 
-<button class="btn-primary" id="jsonEditGenerate">
+<button
+class="btn-primary"
+id="jsonEditGenerate">
 🚀 生成 JSON
 </button>
 
-<button class="btn-success" id="jsonEditDownload" disabled>
+<button
+class="btn-success"
+id="jsonEditDownload"
+disabled>
 ⬇️ 下載 JSON
 </button>
 
-<button class="btn-secondary" id="jsonEditCopy" disabled>
+<button
+class="btn-secondary"
+id="jsonEditCopy"
+disabled>
 📋 複製
 </button>
 
 </div>
 
-<div class="status" id="jsonEditStatus">
+
+<div
+class="status"
+id="jsonEditStatus">
 尚未解析
 </div>
 
-<pre class="output" id="jsonEditOutput">尚無輸出</pre>
+<pre
+class="output"
+id="jsonEditOutput">尚無輸出</pre>
 
 </div>
 
@@ -939,6 +1066,11 @@ placeholder='{
    COMMON
 ===================================================== */
 
+function $(id) {
+    return document.getElementById(id);
+}
+
+
 function escapeHtml(value) {
 
     return String(value)
@@ -951,16 +1083,34 @@ function escapeHtml(value) {
 }
 
 
+function safeFilename(value, fallback) {
+
+    const result =
+        String(value || "")
+        .trim()
+        .replace(/[\\/:*?"<>|]/g, "_")
+        .replace(/\s+/g, "_");
+
+    return result || fallback;
+
+}
+
+
 function downloadText(content, filename, mime) {
 
-    const blob = new Blob(
-        [content],
-        { type: mime + ";charset=utf-8" }
-    );
+    const blob =
+        new Blob(
+            [content],
+            {
+                type: mime + ";charset=utf-8"
+            }
+        );
 
-    const url = URL.createObjectURL(blob);
+    const url =
+        URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
+    const a =
+        document.createElement("a");
 
     a.href = url;
     a.download = filename;
@@ -986,31 +1136,10 @@ async function copyText(text) {
 
         return true;
 
-    } catch (e) {
+    }
+    catch (e) {
 
-        const textarea = document.createElement("textarea");
-
-        textarea.value = text;
-
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-
-        document.body.appendChild(textarea);
-
-        textarea.focus();
-        textarea.select();
-
-        let ok = false;
-
-        try {
-            ok = document.execCommand("copy");
-        } catch (e2) {
-            ok = false;
-        }
-
-        document.body.removeChild(textarea);
-
-        return ok;
+        return false;
 
     }
 
@@ -1021,21 +1150,32 @@ async function copyText(text) {
    MAIN TAB
 ===================================================== */
 
-document.querySelectorAll(".tab").forEach(function(button) {
+document
+.querySelectorAll(".tab")
+.forEach(function(button) {
 
     button.addEventListener("click", function() {
 
-        document.querySelectorAll(".tab")
-            .forEach(x => x.classList.remove("active"));
+        document
+        .querySelectorAll(".tab")
+        .forEach(function(x) {
 
-        document.querySelectorAll(".panel")
-            .forEach(x => x.classList.remove("active"));
+            x.classList.remove("active");
+
+        });
+
+        document
+        .querySelectorAll(".panel")
+        .forEach(function(x) {
+
+            x.classList.remove("active");
+
+        });
 
         button.classList.add("active");
 
-        document
-            .getElementById(button.dataset.main)
-            .classList.add("active");
+        $(button.dataset.main)
+        .classList.add("active");
 
     });
 
@@ -1046,23 +1186,35 @@ document.querySelectorAll(".tab").forEach(function(button) {
    SUB TAB
 ===================================================== */
 
-document.querySelectorAll(".subtab").forEach(function(button) {
+document
+.querySelectorAll(".subtab")
+.forEach(function(button) {
 
     button.addEventListener("click", function() {
 
-        const parent = button.closest(".panel");
+        const parent =
+            button.closest(".panel");
 
-        parent.querySelectorAll(".subtab")
-            .forEach(x => x.classList.remove("active"));
+        parent
+        .querySelectorAll(".subtab")
+        .forEach(function(x) {
 
-        parent.querySelectorAll(".subpanel")
-            .forEach(x => x.classList.remove("active"));
+            x.classList.remove("active");
+
+        });
+
+        parent
+        .querySelectorAll(".subpanel")
+        .forEach(function(x) {
+
+            x.classList.remove("active");
+
+        });
 
         button.classList.add("active");
 
-        parent
-            .querySelector("#" + button.dataset.sub)
-            .classList.add("active");
+        $(button.dataset.sub)
+        .classList.add("active");
 
     });
 
@@ -1081,45 +1233,34 @@ let generatedGpxEdit = "";
 
 
 /* =====================================================
-   SPEED CONVERSION
+   SIMPLE COORDINATE CHECK
 ===================================================== */
 
-/*
-    iTools GPX Speed 關係：
+function isCoordinateLine(line) {
 
-    speed / 50 = m/s
+    const parts =
+        line
+        .split(",")
+        .map(x => x.trim());
 
-    m/s × 3.6 = km/h
-
-    所以：
-
-    km/h = speed × 0.072
-
-    speed = km/h ÷ 0.072
-*/
-
-function kmhToIToolsSpeed(kmh) {
-
-    const value = Number(kmh);
-
-    if (!Number.isFinite(value)) {
-        return 0;
+    if (parts.length < 2) {
+        return false;
     }
 
-    return value / 0.072;
+    const lat =
+        Number(parts[0]);
 
-}
+    const lng =
+        Number(parts[1]);
 
-
-function iToolsSpeedToKmh(speed) {
-
-    const value = Number(speed);
-
-    if (!Number.isFinite(value)) {
-        return 0;
-    }
-
-    return value * 0.072;
+    return (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180
+    );
 
 }
 
@@ -1132,7 +1273,8 @@ function parseSimpleCoordinates(text) {
 
     const result = [];
 
-    const lines = text.split(/\r?\n/);
+    const lines =
+        text.split(/\r?\n/);
 
     lines.forEach(function(line) {
 
@@ -1142,7 +1284,8 @@ function parseSimpleCoordinates(text) {
             return;
         }
 
-        const parts = line
+        const parts =
+            line
             .split(",")
             .map(x => x.trim());
 
@@ -1150,18 +1293,15 @@ function parseSimpleCoordinates(text) {
             return;
         }
 
-        const lat = Number(parts[0]);
+        const lat =
+            Number(parts[0]);
 
-        const lng = Number(parts[1]);
+        const lng =
+            Number(parts[1]);
 
         if (
             !Number.isFinite(lat) ||
-            !Number.isFinite(lng)
-        ) {
-            return;
-        }
-
-        if (
+            !Number.isFinite(lng) ||
             lat < -90 ||
             lat > 90 ||
             lng < -180 ||
@@ -1171,9 +1311,15 @@ function parseSimpleCoordinates(text) {
         }
 
         result.push({
-            title: parts[2] || "",
+
+            title:
+                parts.length >= 3
+                    ? parts.slice(2).join(",").trim()
+                    : "",
+
             lat: parts[0],
             lng: parts[1]
+
         });
 
     });
@@ -1184,31 +1330,67 @@ function parseSimpleCoordinates(text) {
 
 
 /* =====================================================
+   KM/H → ITOOLS SPEED
+===================================================== */
+
+function kmhToItoolsSpeed(kmh) {
+
+    return Number(kmh) / 0.072;
+
+}
+
+
+function itoolsSpeedToKmh(speed) {
+
+    return Number(speed) * 0.072;
+
+}
+
+
+function formatItoolsSpeed(value) {
+
+    const n = Number(value);
+
+    if (!Number.isFinite(n)) {
+        return "0.0";
+    }
+
+    if (Math.abs(n - Math.round(n)) < 0.0000001) {
+
+        return n.toFixed(1);
+
+    }
+
+    return n.toFixed(4);
+
+}
+
+
+/* =====================================================
    CREATE GPX
 ===================================================== */
 
 function createGpx(points, speedKmh, loop) {
 
-    const iToolsSpeed =
-        kmhToIToolsSpeed(speedKmh);
-
-    const speedText =
-        iToolsSpeed.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    const itoolsSpeed =
+        formatItoolsSpeed(
+            kmhToItoolsSpeed(speedKmh)
+        );
 
     let xml =
 `<?xml version="1.0" encoding="UTF-8" ?>
 <gpx>
- <iToolsData speed="${escapeHtml(speedText)}" link="https://tools.walkerpokemon.com" loop="${escapeHtml(loop)}">
- <rights>Copyright (c) 2018, walkerpokemon</rights>
- </iToolsData>
+    <iToolsData speed="${escapeHtml(itoolsSpeed)}" link="https://www.thinkskysoft.com" loop="${escapeHtml(loop)}">
+        <rights>Copyright (c) 2018, thinkskysoft</rights>
+    </iToolsData>
 `;
 
     points.forEach(function(point) {
 
         xml +=
-` <wpt lat="${escapeHtml(point.lat)}" lon="${escapeHtml(point.lng)}">
- <name>${escapeHtml(point.title)}</name>
- </wpt>
+`    <wpt lat="${escapeHtml(point.lat)}" lon="${escapeHtml(point.lng)}">
+        <name>${escapeHtml(point.title)}</name>
+    </wpt>
 `;
 
     });
@@ -1224,21 +1406,22 @@ function createGpx(points, speedKmh, loop) {
    GPX TXT FILE
 ===================================================== */
 
-document
-.getElementById("gpxTxtFile")
+$("gpxTxtFile")
 .addEventListener("change", function() {
 
     const file = this.files[0];
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
 
-    const reader = new FileReader();
+    const reader =
+        new FileReader();
 
     reader.onload = function(e) {
 
-        document
-            .getElementById("gpxTxtInput")
-            .value = e.target.result;
+        $("gpxTxtInput").value =
+            e.target.result;
 
     };
 
@@ -1251,13 +1434,12 @@ document
    GPX TXT GENERATE
 ===================================================== */
 
-document
-.getElementById("gpxTxtGenerate")
+$("gpxTxtGenerate")
 .addEventListener("click", function() {
 
     const points =
         parseSimpleCoordinates(
-            document.getElementById("gpxTxtInput").value
+            $("gpxTxtInput").value
         );
 
     if (!points.length) {
@@ -1269,48 +1451,55 @@ document
     }
 
     const name =
-        document
-            .getElementById("gpxTxtName")
-            .value
-            .trim() || "itools_route";
+        $("gpxTxtName")
+        .value
+        .trim() || "itools_route";
 
     points.forEach(function(point) {
+
         point.title = name;
+
     });
 
-    const speed =
-        document
-            .getElementById("gpxTxtSpeed")
-            .value || "8.64";
+    const speedKmh =
+        Number(
+            $("gpxTxtSpeedKmh").value
+        );
+
+    if (
+        !Number.isFinite(speedKmh) ||
+        speedKmh < 0
+    ) {
+
+        alert("速度必須是有效的 km/h");
+
+        return;
+
+    }
 
     const loop =
-        document
-            .getElementById("gpxTxtLoop")
-            .value || "0";
+        $("gpxTxtLoop").value || "0";
 
     generatedGpxTxt =
         createGpx(
             points,
-            speed,
+            speedKmh,
             loop
         );
 
-    document
-        .getElementById("gpxTxtOutput")
-        .textContent = generatedGpxTxt;
+    $("gpxTxtOutput")
+    .textContent =
+        generatedGpxTxt;
 
-    document
-        .getElementById("gpxTxtStatus")
-        .textContent =
-        `完成：${points.length} 個座標，速度 ${Number(speed).toFixed(2)} km/h`;
+    $("gpxTxtStatus")
+    .textContent =
+        `完成：${points.length} 個座標，速度 ${speedKmh} km/h，iTools Speed ${formatItoolsSpeed(kmhToItoolsSpeed(speedKmh))}`;
 
-    document
-        .getElementById("gpxTxtDownload")
-        .disabled = false;
+    $("gpxTxtDownload")
+    .disabled = false;
 
-    document
-        .getElementById("gpxTxtCopy")
-        .disabled = false;
+    $("gpxTxtCopy")
+    .disabled = false;
 
 });
 
@@ -1319,18 +1508,18 @@ document
    GPX TXT DOWNLOAD
 ===================================================== */
 
-document
-.getElementById("gpxTxtDownload")
+$("gpxTxtDownload")
 .addEventListener("click", function() {
 
     let filename =
-        document
-            .getElementById("gpxTxtFilename")
-            .value
-            .trim() || "itools_route";
+        $("gpxTxtFilename")
+        .value
+        .trim() || "itools_route";
 
-    if (!filename.endsWith(".gpx")) {
+    if (!filename.toLowerCase().endsWith(".gpx")) {
+
         filename += ".gpx";
+
     }
 
     downloadText(
@@ -1342,39 +1531,71 @@ document
 });
 
 
-document
-.getElementById("gpxTxtCopy")
+$("gpxTxtCopy")
 .addEventListener("click", async function() {
 
-    const ok = await copyText(generatedGpxTxt);
+    const ok =
+        await copyText(
+            generatedGpxTxt
+        );
 
-    document
-        .getElementById("gpxTxtStatus")
-        .textContent =
-        ok ? "GPX 已複製" : "複製失敗";
+    $("gpxTxtStatus")
+    .textContent =
+        ok
+            ? "GPX 已複製"
+            : "複製失敗";
 
 });
 
 
 /* =====================================================
-   GPX REVERSE PARSE
+   GPX CLEAR
 ===================================================== */
 
-document
-.getElementById("gpxEditFile")
+$("gpxTxtClear")
+.addEventListener("click", function() {
+
+    generatedGpxTxt = "";
+
+    $("gpxTxtInput").value = "";
+
+    $("gpxTxtOutput")
+    .textContent =
+        "尚無輸出";
+
+    $("gpxTxtDownload")
+    .disabled = true;
+
+    $("gpxTxtCopy")
+    .disabled = true;
+
+    $("gpxTxtStatus")
+    .textContent =
+        "已清除";
+
+});
+
+
+/* =====================================================
+   GPX REVERSE FILE
+===================================================== */
+
+$("gpxEditFile")
 .addEventListener("change", function() {
 
     const file = this.files[0];
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
 
-    const reader = new FileReader();
+    const reader =
+        new FileReader();
 
     reader.onload = function(e) {
 
-        document
-            .getElementById("gpxEditInput")
-            .value = e.target.result;
+        $("gpxEditInput").value =
+            e.target.result;
 
         parseGpxEditor();
 
@@ -1392,10 +1613,9 @@ document
 function parseGpxEditor() {
 
     const text =
-        document
-            .getElementById("gpxEditInput")
-            .value
-            .trim();
+        $("gpxEditInput")
+        .value
+        .trim();
 
     if (!text) {
 
@@ -1407,7 +1627,8 @@ function parseGpxEditor() {
 
     try {
 
-        const parser = new DOMParser();
+        const parser =
+            new DOMParser();
 
         const doc =
             parser.parseFromString(
@@ -1450,9 +1671,11 @@ function parseGpxEditor() {
                     : "";
 
             gpxPoints.push({
+
                 title,
                 lat,
                 lng
+
             });
 
         });
@@ -1471,21 +1694,19 @@ function parseGpxEditor() {
 
             if (speed !== null) {
 
-                const kmh =
-                    iToolsSpeedToKmh(speed);
+                const speedKmh =
+                    itoolsSpeedToKmh(speed);
 
-                document
-                    .getElementById("gpxEditSpeed")
-                    .value =
-                    kmh.toFixed(2);
+                $("gpxEditSpeedKmh")
+                .value =
+                    speedKmh.toFixed(2);
 
             }
 
             if (loop !== null) {
 
-                document
-                    .getElementById("gpxEditLoop")
-                    .value = loop;
+                $("gpxEditLoop")
+                .value = loop;
 
             }
 
@@ -1493,9 +1714,8 @@ function parseGpxEditor() {
 
         renderGpxEditor();
 
-        document
-            .getElementById("gpxEditStatus")
-            .textContent =
+        $("gpxEditStatus")
+        .textContent =
             `解析完成：${gpxPoints.length} 個座標`;
 
     }
@@ -1511,8 +1731,7 @@ function parseGpxEditor() {
 }
 
 
-document
-.getElementById("gpxParseButton")
+$("gpxParseButton")
 .addEventListener(
     "click",
     parseGpxEditor
@@ -1520,18 +1739,18 @@ document
 
 
 /* =====================================================
-   RENDER GPX
+   RENDER GPX EDITOR
 ===================================================== */
 
 function renderGpxEditor() {
 
     const container =
-        document.getElementById("gpxEditTable");
+        $("gpxEditTable");
 
-    document
-        .getElementById("gpxPointCount")
-        .textContent =
-        gpxPoints.length + " 個座標";
+    $("gpxPointCount")
+    .textContent =
+        gpxPoints.length +
+        " 個座標";
 
     if (!gpxPoints.length) {
 
@@ -1547,6 +1766,7 @@ function renderGpxEditor() {
 <table>
 
 <thead>
+
 <tr>
 <th>#</th>
 <th>名稱</th>
@@ -1554,6 +1774,7 @@ function renderGpxEditor() {
 <th>經度</th>
 <th>操作</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -1592,11 +1813,13 @@ data-index="${index}">
 </td>
 
 <td>
+
 <button
 class="btn-danger delete-small"
 data-gpx-delete="${index}">
 刪除
 </button>
+
 </td>
 
 </tr>
@@ -1614,41 +1837,43 @@ data-gpx-delete="${index}">
 
 
     container
-        .querySelectorAll("[data-gpx-field]")
-        .forEach(function(input) {
+    .querySelectorAll("[data-gpx-field]")
+    .forEach(function(input) {
 
-            input.addEventListener("input", function() {
+        input.addEventListener("input", function() {
 
-                const index =
-                    Number(input.dataset.index);
+            const index =
+                Number(input.dataset.index);
 
-                const field =
-                    input.dataset.gpxField;
+            const field =
+                input.dataset.gpxField;
 
-                gpxPoints[index][field] =
-                    input.value;
-
-            });
+            gpxPoints[index][field] =
+                input.value;
 
         });
+
+    });
 
 
     container
-        .querySelectorAll("[data-gpx-delete]")
-        .forEach(function(button) {
+    .querySelectorAll("[data-gpx-delete]")
+    .forEach(function(button) {
 
-            button.addEventListener("click", function() {
+        button.addEventListener("click", function() {
 
-                const index =
-                    Number(button.dataset.gpxDelete);
+            const index =
+                Number(
+                    button.dataset.gpxDelete
+                );
 
-                gpxPoints.splice(index, 1);
+            gpxPoints.splice(index, 1);
 
-                renderGpxEditor();
-
-            });
+            renderGpxEditor();
 
         });
+
+    });
 
 }
 
@@ -1657,14 +1882,18 @@ data-gpx-delete="${index}">
    ADD GPX POINT
 ===================================================== */
 
-document
-.getElementById("gpxAddPoint")
+$("gpxAddPoint")
 .addEventListener("click", function() {
 
     gpxPoints.push({
-        title: "WP" + (gpxPoints.length + 1),
+
+        title:
+            "WP" +
+            (gpxPoints.length + 1),
+
         lat: "",
         lng: ""
+
     });
 
     renderGpxEditor();
@@ -1676,8 +1905,7 @@ document
    GENERATE EDITED GPX
 ===================================================== */
 
-document
-.getElementById("gpxEditGenerate")
+$("gpxEditGenerate")
 .addEventListener("click", function() {
 
     if (!gpxPoints.length) {
@@ -1694,10 +1922,14 @@ document
         i++
     ) {
 
-        const point = gpxPoints[i];
+        const point =
+            gpxPoints[i];
 
-        const lat = Number(point.lat);
-        const lng = Number(point.lng);
+        const lat =
+            Number(point.lat);
+
+        const lng =
+            Number(point.lng);
 
         if (
             !Number.isFinite(lat) ||
@@ -1729,40 +1961,45 @@ document
 
     }
 
-    const speed =
-        document
-            .getElementById("gpxEditSpeed")
-            .value || "8.64";
+    const speedKmh =
+        Number(
+            $("gpxEditSpeedKmh").value
+        );
+
+    if (
+        !Number.isFinite(speedKmh) ||
+        speedKmh < 0
+    ) {
+
+        alert("速度必須是有效的 km/h");
+
+        return;
+
+    }
 
     const loop =
-        document
-            .getElementById("gpxEditLoop")
-            .value || "0";
+        $("gpxEditLoop").value || "0";
 
     generatedGpxEdit =
         createGpx(
             gpxPoints,
-            speed,
+            speedKmh,
             loop
         );
 
-    document
-        .getElementById("gpxEditOutput")
-        .textContent =
+    $("gpxEditOutput")
+    .textContent =
         generatedGpxEdit;
 
-    document
-        .getElementById("gpxEditDownload")
-        .disabled = false;
+    $("gpxEditDownload")
+    .disabled = false;
 
-    document
-        .getElementById("gpxEditCopy")
-        .disabled = false;
+    $("gpxEditCopy")
+    .disabled = false;
 
-    document
-        .getElementById("gpxEditStatus")
-        .textContent =
-        `GPX 生成完成：${gpxPoints.length} 個座標，速度 ${Number(speed).toFixed(2)} km/h`;
+    $("gpxEditStatus")
+    .textContent =
+        `GPX 生成完成：${gpxPoints.length} 個座標，速度 ${speedKmh} km/h，iTools Speed ${formatItoolsSpeed(kmhToItoolsSpeed(speedKmh))}`;
 
 });
 
@@ -1771,18 +2008,18 @@ document
    GPX EDIT DOWNLOAD
 ===================================================== */
 
-document
-.getElementById("gpxEditDownload")
+$("gpxEditDownload")
 .addEventListener("click", function() {
 
     let filename =
-        document
-            .getElementById("gpxEditFilename")
-            .value
-            .trim() || "edited_route";
+        $("gpxEditFilename")
+        .value
+        .trim() || "edited_route";
 
-    if (!filename.endsWith(".gpx")) {
+    if (!filename.toLowerCase().endsWith(".gpx")) {
+
         filename += ".gpx";
+
     }
 
     downloadText(
@@ -1794,51 +2031,55 @@ document
 });
 
 
-document
-.getElementById("gpxEditCopy")
+$("gpxEditCopy")
 .addEventListener("click", async function() {
 
     const ok =
-        await copyText(generatedGpxEdit);
+        await copyText(
+            generatedGpxEdit
+        );
 
-    document
-        .getElementById("gpxEditStatus")
-        .textContent =
-        ok ? "GPX 已複製" : "複製失敗";
+    $("gpxEditStatus")
+    .textContent =
+        ok
+            ? "GPX 已複製"
+            : "複製失敗";
 
 });
 
 
 /* =====================================================
-   GPX CLEAR
+   GPX EDIT CLEAR
 ===================================================== */
 
-document
-.getElementById("gpxEditClear")
+$("gpxEditClear")
 .addEventListener("click", function() {
 
     gpxPoints = [];
+
     generatedGpxEdit = "";
 
-    document
-        .getElementById("gpxEditInput")
-        .value = "";
+    $("gpxEditInput").value = "";
 
-    document
-        .getElementById("gpxEditOutput")
-        .textContent = "尚無輸出";
+    $("gpxEditOutput")
+    .textContent =
+        "尚無輸出";
 
-    document
-        .getElementById("gpxEditDownload")
-        .disabled = true;
+    $("gpxEditDownload")
+    .disabled = true;
 
-    document
-        .getElementById("gpxEditCopy")
-        .disabled = true;
+    $("gpxEditCopy")
+    .disabled = true;
 
-    document
-        .getElementById("gpxEditStatus")
-        .textContent = "已清除";
+    $("gpxEditSpeedKmh")
+    .value = "8.64";
+
+    $("gpxEditLoop")
+    .value = "0";
+
+    $("gpxEditStatus")
+    .textContent =
+        "已清除";
 
     renderGpxEditor();
 
@@ -1857,95 +2098,44 @@ let generatedJsonEdit = "";
 
 
 /* =====================================================
-   JSON TXT PARSER
+   PARSE TXT → JSON
 ===================================================== */
-
-/*
-    支援：
-
-    A.
-    ### 福岡
-    33.5,130.4,名稱
-
-    B.
-    高知空港
-    33.54744,133.67392
-
-    C.
-    33.54744,133.67392,高知空港
-
-    D.
-    33.54744,133.67392
-
-    E.
-    ### 福岡
-    高知空港
-    33.54744,133.67392
-
-    沒有 ### 時：
-
-    群組名稱 = 使用者輸入
-    空白 = Default
-*/
-
 
 function parseJsonTxt(text) {
 
     const groups = [];
 
-    const lines =
-        text.split(/\r?\n/);
-
-    const userGroup =
-        document
-            .getElementById("jsonDefaultGroup")
-            .value
-            .trim() || "Default";
-
-
-    let hasGroupHeader = false;
-
     let current = null;
 
-    let pendingName = null;
+    let pendingTitle = "";
+
+    const defaultGroup =
+        $("jsonTxtDefaultGroup")
+        .value
+        .trim() || "Default";
 
 
-    function createGroup(name) {
-
-        const group = {
-            group: name || "Default",
-            points: []
-        };
-
-        groups.push(group);
-
-        return group;
-
-    }
-
-
-    function getCurrentGroup() {
+    function ensureDefaultGroup() {
 
         if (!current) {
 
-            current =
-                createGroup(userGroup);
+            current = {
+
+                group: defaultGroup,
+
+                points: []
+
+            };
+
+            groups.push(current);
 
         }
 
-        return current;
-
     }
 
 
-    function createAutoTitle(group) {
-
-        return (
-            group.group +
-            (group.points.length + 1)
-        );
-
-    }
+    const lines =
+        text.split(/\r?\n/);
 
 
     for (
@@ -1954,168 +2144,149 @@ function parseJsonTxt(text) {
         i++
     ) {
 
-        const raw =
-            lines[i];
-
         const line =
-            raw.trim();
-
+            lines[i].trim();
 
         if (!line) {
             continue;
         }
 
 
-        /* ### 群組 */
+        /* ---------------------------------------------
+           ### 群組
+        --------------------------------------------- */
 
         if (line.startsWith("###")) {
 
             const name =
                 line
-                    .replace(/^###\s*/, "")
-                    .trim();
+                .replace(/^###\s*/, "")
+                .trim();
 
-            if (!name) {
-                continue;
+            if (name) {
+
+                current = {
+
+                    group: name,
+
+                    points: []
+
+                };
+
+                groups.push(current);
+
             }
 
-            hasGroupHeader = true;
-
-            current =
-                createGroup(name);
-
-            pendingName = null;
+            pendingTitle = "";
 
             continue;
 
         }
 
 
-        /* 其他 # 註解 */
+        /* ---------------------------------------------
+           其他 # 註解
+        --------------------------------------------- */
 
         if (line.startsWith("#")) {
+
             continue;
+
         }
 
 
-        const parts =
-            line
+        /* ---------------------------------------------
+           座標行
+        --------------------------------------------- */
+
+        if (isCoordinateLine(line)) {
+
+            ensureDefaultGroup();
+
+            const parts =
+                line
                 .split(",")
                 .map(x => x.trim());
 
 
-        /* -----------------------------------------
-           座標格式
-        ----------------------------------------- */
-
-        if (parts.length >= 2) {
-
-            const lat =
-                Number(parts[0]);
-
-            const lng =
-                Number(parts[1]);
+            let title = "";
 
 
+            /*
+             * 格式：
+             *
+             * 緯度,經度,名稱
+             */
             if (
-                Number.isFinite(lat) &&
-                Number.isFinite(lng) &&
-                lat >= -90 &&
-                lat <= 90 &&
-                lng >= -180 &&
-                lng <= 180
+                parts.length >= 3 &&
+                parts.slice(2)
+                .join(",")
+                .trim()
             ) {
 
-                const group =
-                    getCurrentGroup();
-
-
-                let title = "";
-
-
-                /*
-                    緯度,經度,名稱
-                */
-
-                if (
-                    parts.length >= 3 &&
+                title =
                     parts
-                        .slice(2)
-                        .join(",")
-                        .trim()
-                ) {
-
-                    title =
-                        parts
-                            .slice(2)
-                            .join(",")
-                            .trim();
-
-                }
-
-
-                /*
-                    名稱 + 下一行座標
-                */
-
-                else if (
-                    pendingName
-                ) {
-
-                    title =
-                        pendingName;
-
-                    pendingName = null;
-
-                }
-
-
-                /*
-                    都沒有名稱
-                */
-
-                else {
-
-                    title =
-                        createAutoTitle(group);
-
-                }
-
-
-                group.points.push({
-
-                    title,
-
-                    lat: parts[0],
-
-                    lng: parts[1]
-
-                });
-
-
-                continue;
+                    .slice(2)
+                    .join(",")
+                    .trim();
 
             }
+            /*
+             * 格式：
+             *
+             * 名稱
+             * 緯度,經度
+             */
+            else if (pendingTitle) {
+
+                title =
+                    pendingTitle;
+
+            }
+            /*
+             * 沒有名稱
+             */
+            else {
+
+                title =
+                    current.group +
+                    (current.points.length + 1);
+
+            }
+
+
+            current.points.push({
+
+                title,
+
+                lat: parts[0],
+
+                lng: parts[1]
+
+            });
+
+
+            pendingTitle = "";
+
+            continue;
 
         }
 
 
-        /*
-            如果不是座標：
+        /* ---------------------------------------------
+           非座標文字：
+           視為下一個座標的名稱
+        --------------------------------------------- */
 
-            將它視為下一個座標的名稱
-        */
+        if (!current) {
 
-        pendingName = line;
+            ensureDefaultGroup();
+
+        }
+
+        pendingTitle = line;
 
     }
-
-
-    /*
-        如果有 pendingName，
-        代表最後一行只有名稱，沒有座標。
-        不建立座標。
-    */
 
 
     return groups;
@@ -2131,12 +2302,16 @@ function objectToJsonGroups(obj) {
 
     const groups = [];
 
-    Object.keys(obj).forEach(function(groupName) {
+    Object.keys(obj)
+    .forEach(function(groupName) {
 
-        const value = obj[groupName];
+        const value =
+            obj[groupName];
 
         if (!Array.isArray(value)) {
+
             return;
+
         }
 
         const points = [];
@@ -2147,7 +2322,9 @@ function objectToJsonGroups(obj) {
                 !point ||
                 typeof point !== "object"
             ) {
+
                 return;
+
             }
 
             points.push({
@@ -2171,15 +2348,17 @@ function objectToJsonGroups(obj) {
 
         });
 
+
         groups.push({
 
-            group: String(groupName),
+            group: groupName,
 
             points
 
         });
 
     });
+
 
     return groups;
 
@@ -2196,19 +2375,24 @@ function renderJsonGroups(
 ) {
 
     const container =
-        document.getElementById(containerId);
+        $(containerId);
 
     const count =
         jsonGroups.reduce(
-            (sum, group) =>
-                sum + group.points.length,
+            function(sum, group) {
+
+                return sum +
+                    group.points.length;
+
+            },
             0
         );
 
-    document
-        .getElementById(countId)
-        .textContent =
-        count + " 個座標";
+
+    $(countId)
+    .textContent =
+        count +
+        " 個座標";
 
 
     if (!jsonGroups.length) {
@@ -2257,6 +2441,7 @@ data-group-delete="${groupIndex}">
 <table>
 
 <thead>
+
 <tr>
 <th>#</th>
 <th>點位名稱</th>
@@ -2264,6 +2449,7 @@ data-group-delete="${groupIndex}">
 <th>經度</th>
 <th>操作</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -2277,33 +2463,41 @@ data-group-delete="${groupIndex}">
 `
 <tr>
 
-<td>${pointIndex + 1}</td>
+<td>
+${pointIndex + 1}
+</td>
 
 <td>
+
 <input
 type="text"
 value="${escapeHtml(point.title)}"
 data-json-field="title"
 data-group="${groupIndex}"
 data-point="${pointIndex}">
+
 </td>
 
 <td>
+
 <input
 type="text"
 value="${escapeHtml(point.lat)}"
 data-json-field="lat"
 data-group="${groupIndex}"
 data-point="${pointIndex}">
+
 </td>
 
 <td>
+
 <input
 type="text"
 value="${escapeHtml(point.lng)}"
 data-json-field="lng"
 data-group="${groupIndex}"
 data-point="${pointIndex}">
+
 </td>
 
 <td>
@@ -2331,7 +2525,9 @@ data-point-delete="${groupIndex}:${pointIndex}">
 
 </div>
 
-<div class="toolbar" style="padding:10px">
+<div
+class="toolbar"
+style="padding:10px">
 
 <button
 class="btn-secondary"
@@ -2348,175 +2544,196 @@ data-add-point="${groupIndex}">
     );
 
 
-    container.innerHTML = html;
+    container.innerHTML =
+        html;
 
 
-    /* 群組名稱 */
-
-    container
-        .querySelectorAll("[data-group-name]")
-        .forEach(function(input) {
-
-            input.addEventListener(
-                "input",
-                function() {
-
-                    const index =
-                        Number(
-                            input.dataset.groupName
-                        );
-
-                    jsonGroups[index].group =
-                        input.value;
-
-                }
-            );
-
-        });
-
-
-    /* 點位 */
+    /* ---------------------------------------------
+       群組名稱
+    --------------------------------------------- */
 
     container
-        .querySelectorAll("[data-json-field]")
-        .forEach(function(input) {
+    .querySelectorAll(
+        "[data-group-name]"
+    )
+    .forEach(function(input) {
 
-            input.addEventListener(
-                "input",
-                function() {
+        input.addEventListener(
+            "input",
+            function() {
 
-                    const gi =
-                        Number(
-                            input.dataset.group
-                        );
-
-                    const pi =
-                        Number(
-                            input.dataset.point
-                        );
-
-                    const field =
-                        input.dataset.jsonField;
-
-                    jsonGroups[gi]
-                        .points[pi][field] =
-                        input.value;
-
-                }
-            );
-
-        });
-
-
-    /* 刪除點位 */
-
-    container
-        .querySelectorAll("[data-point-delete]")
-        .forEach(function(button) {
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    const parts =
-                        button
-                            .dataset
-                            .pointDelete
-                            .split(":")
-                            .map(Number);
-
-                    const gi = parts[0];
-                    const pi = parts[1];
-
-                    jsonGroups[gi]
-                        .points
-                        .splice(pi, 1);
-
-                    renderJsonGroups(
-                        containerId,
-                        countId
+                const index =
+                    Number(
+                        input.dataset.groupName
                     );
 
-                }
-            );
+                jsonGroups[index].group =
+                    input.value;
 
-        });
+            }
+        );
 
-
-    /* 刪除群組 */
-
-    container
-        .querySelectorAll("[data-group-delete]")
-        .forEach(function(button) {
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    const gi =
-                        Number(
-                            button
-                                .dataset
-                                .groupDelete
-                        );
-
-                    jsonGroups.splice(
-                        gi,
-                        1
-                    );
-
-                    renderJsonGroups(
-                        containerId,
-                        countId
-                    );
-
-                }
-            );
-
-        });
+    });
 
 
-    /* 群組新增座標 */
+    /* ---------------------------------------------
+       點位資料
+    --------------------------------------------- */
 
     container
-        .querySelectorAll("[data-add-point]")
-        .forEach(function(button) {
+    .querySelectorAll(
+        "[data-json-field]"
+    )
+    .forEach(function(input) {
 
-            button.addEventListener(
-                "click",
-                function() {
+        input.addEventListener(
+            "input",
+            function() {
 
-                    const gi =
-                        Number(
-                            button
-                                .dataset
-                                .addPoint
-                        );
-
-                    const group =
-                        jsonGroups[gi];
-
-                    group.points.push({
-
-                        title:
-                            group.group +
-                            (group.points.length + 1),
-
-                        lat: "",
-
-                        lng: ""
-
-                    });
-
-                    renderJsonGroups(
-                        containerId,
-                        countId
+                const gi =
+                    Number(
+                        input.dataset.group
                     );
 
-                }
-            );
+                const pi =
+                    Number(
+                        input.dataset.point
+                    );
 
-        });
+                const field =
+                    input.dataset.jsonField;
+
+                jsonGroups[gi]
+                    .points[pi][field] =
+                    input.value;
+
+            }
+        );
+
+    });
+
+
+    /* ---------------------------------------------
+       刪除點位
+    --------------------------------------------- */
+
+    container
+    .querySelectorAll(
+        "[data-point-delete]"
+    )
+    .forEach(function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const parts =
+                    button.dataset
+                    .pointDelete
+                    .split(":")
+                    .map(Number);
+
+                const gi = parts[0];
+
+                const pi = parts[1];
+
+                jsonGroups[gi]
+                    .points
+                    .splice(pi, 1);
+
+                renderJsonGroups(
+                    containerId,
+                    countId
+                );
+
+            }
+        );
+
+    });
+
+
+    /* ---------------------------------------------
+       刪除群組
+    --------------------------------------------- */
+
+    container
+    .querySelectorAll(
+        "[data-group-delete]"
+    )
+    .forEach(function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const gi =
+                    Number(
+                        button.dataset
+                        .groupDelete
+                    );
+
+                jsonGroups.splice(
+                    gi,
+                    1
+                );
+
+                renderJsonGroups(
+                    containerId,
+                    countId
+                );
+
+            }
+        );
+
+    });
+
+
+    /* ---------------------------------------------
+       群組內新增
+    --------------------------------------------- */
+
+    container
+    .querySelectorAll(
+        "[data-add-point]"
+    )
+    .forEach(function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const gi =
+                    Number(
+                        button.dataset
+                        .addPoint
+                    );
+
+                const group =
+                    jsonGroups[gi];
+
+
+                group.points.push({
+
+                    title:
+                        group.group +
+                        (group.points.length + 1),
+
+                    lat: "",
+
+                    lng: ""
+
+                });
+
+
+                renderJsonGroups(
+                    containerId,
+                    countId
+                );
+
+            }
+        );
+
+    });
 
 }
 
@@ -2525,28 +2742,32 @@ data-add-point="${groupIndex}">
    JSON TXT FILE
 ===================================================== */
 
-document
-.getElementById("jsonTxtFile")
+$("jsonTxtFile")
 .addEventListener("change", function() {
 
     const file = this.files[0];
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
 
-    const reader = new FileReader();
+    const reader =
+        new FileReader();
 
     reader.onload = function(e) {
 
-        document
-            .getElementById("jsonTxtInput")
-            .value =
+        $("jsonTxtInput")
+        .value =
             e.target.result;
 
         parseJsonTxtButton();
 
     };
 
-    reader.readAsText(file, "UTF-8");
+    reader.readAsText(
+        file,
+        "UTF-8"
+    );
 
 });
 
@@ -2558,9 +2779,8 @@ document
 function parseJsonTxtButton() {
 
     const text =
-        document
-            .getElementById("jsonTxtInput")
-            .value;
+        $("jsonTxtInput")
+        .value;
 
     jsonGroups =
         parseJsonTxt(text);
@@ -2570,23 +2790,27 @@ function parseJsonTxtButton() {
         "jsonTxtCount"
     );
 
-    const total =
+
+    const count =
         jsonGroups.reduce(
-            (sum, group) =>
-                sum + group.points.length,
+            function(sum, group) {
+
+                return sum +
+                    group.points.length;
+
+            },
             0
         );
 
-    document
-        .getElementById("jsonTxtStatus")
-        .textContent =
-        `分析完成：${jsonGroups.length} 個群組，共 ${total} 個座標`;
+
+    $("jsonTxtStatus")
+    .textContent =
+        `分析完成：${jsonGroups.length} 個群組，共 ${count} 個座標`;
 
 }
 
 
-document
-.getElementById("jsonTxtParse")
+$("jsonTxtParse")
 .addEventListener(
     "click",
     parseJsonTxtButton
@@ -2612,8 +2836,7 @@ function addJsonGroup() {
 }
 
 
-document
-.getElementById("jsonAddGroup")
+$("jsonAddGroup")
 .addEventListener("click", function() {
 
     addJsonGroup();
@@ -2630,18 +2853,20 @@ document
    JSON ADD POINT
 ===================================================== */
 
-document
-.getElementById("jsonAddPoint")
+$("jsonAddPoint")
 .addEventListener("click", function() {
 
     if (!jsonGroups.length) {
+
         addJsonGroup();
+
     }
 
     const group =
         jsonGroups[
             jsonGroups.length - 1
         ];
+
 
     group.points.push({
 
@@ -2655,6 +2880,7 @@ document
 
     });
 
+
     renderJsonGroups(
         "jsonTxtTable",
         "jsonTxtCount"
@@ -2664,30 +2890,31 @@ document
 
 
 /* =====================================================
-   AUTO NAME
+   JSON AUTO NAME
 ===================================================== */
 
 function autoNameJson() {
 
-    jsonGroups.forEach(function(group) {
+    jsonGroups.forEach(
+        function(group) {
 
-        group.points.forEach(
-            function(point, index) {
+            group.points.forEach(
+                function(point, index) {
 
-                point.title =
-                    group.group +
-                    (index + 1);
+                    point.title =
+                        group.group +
+                        (index + 1);
 
-            }
-        );
+                }
+            );
 
-    });
+        }
+    );
 
 }
 
 
-document
-.getElementById("jsonAutoName")
+$("jsonAutoName")
 .addEventListener("click", function() {
 
     autoNameJson();
@@ -2701,7 +2928,7 @@ document
 
 
 /* =====================================================
-   VALIDATE JSON
+   JSON VALIDATE
 ===================================================== */
 
 function validateJsonGroups() {
@@ -2809,6 +3036,7 @@ function createJsonFromGroups() {
 
     const result = {};
 
+
     jsonGroups.forEach(function(group) {
 
         result[group.group] =
@@ -2833,6 +3061,7 @@ function createJsonFromGroups() {
 
     });
 
+
     return JSON.stringify(
         result,
         null,
@@ -2843,65 +3072,113 @@ function createJsonFromGroups() {
 
 
 /* =====================================================
+   JSON FILE NAME
+   使用所有群組名稱
+===================================================== */
+
+function getJsonFilename() {
+
+    const groups =
+        jsonGroups
+        .map(function(group) {
+
+            return group.group.trim();
+
+        })
+        .filter(Boolean);
+
+
+    if (!groups.length) {
+
+        return "coordinates.json";
+
+    }
+
+
+    const name =
+        groups.join("_");
+
+
+    return (
+        safeFilename(
+            name,
+            "coordinates"
+        ) +
+        ".json"
+    );
+
+}
+
+
+/* =====================================================
    JSON TXT GENERATE
 ===================================================== */
 
-document
-.getElementById("jsonTxtGenerate")
+$("jsonTxtGenerate")
 .addEventListener("click", function() {
 
     if (!validateJsonGroups()) {
+
         return;
+
     }
+
 
     generatedJsonTxt =
         createJsonFromGroups();
 
-    document
-        .getElementById("jsonTxtOutput")
-        .textContent =
+
+    $("jsonTxtOutput")
+    .textContent =
         generatedJsonTxt;
 
-    document
-        .getElementById("jsonTxtDownload")
-        .disabled = false;
 
-    document
-        .getElementById("jsonTxtCopy")
-        .disabled = false;
+    $("jsonTxtDownload")
+    .disabled = false;
 
-    document
-        .getElementById("jsonTxtStatus")
-        .textContent =
-        "JSON 生成完成";
+
+    $("jsonTxtCopy")
+    .disabled = false;
+
+
+    $("jsonTxtStatus")
+    .textContent =
+        "JSON 生成完成，檔名：" +
+        getJsonFilename();
 
 });
 
 
-document
-.getElementById("jsonTxtDownload")
+/* =====================================================
+   JSON TXT DOWNLOAD
+===================================================== */
+
+$("jsonTxtDownload")
 .addEventListener("click", function() {
 
     downloadText(
         generatedJsonTxt,
-        "coordinates.json",
+        getJsonFilename(),
         "application/json"
     );
 
 });
 
 
-document
-.getElementById("jsonTxtCopy")
+$("jsonTxtCopy")
 .addEventListener("click", async function() {
 
     const ok =
-        await copyText(generatedJsonTxt);
+        await copyText(
+            generatedJsonTxt
+        );
 
-    document
-        .getElementById("jsonTxtStatus")
-        .textContent =
-        ok ? "JSON 已複製" : "複製失敗";
+
+    $("jsonTxtStatus")
+    .textContent =
+        ok
+            ? "JSON 已複製"
+            : "複製失敗";
 
 });
 
@@ -2910,38 +3187,28 @@ document
    JSON TXT CLEAR
 ===================================================== */
 
-document
-.getElementById("jsonTxtClear")
+$("jsonTxtClear")
 .addEventListener("click", function() {
 
     jsonGroups = [];
 
     generatedJsonTxt = "";
 
-    document
-        .getElementById("jsonTxtInput")
-        .value = "";
+    $("jsonTxtInput")
+    .value = "";
 
-    document
-        .getElementById("jsonDefaultGroup")
-        .value = "";
-
-    document
-        .getElementById("jsonTxtOutput")
-        .textContent =
+    $("jsonTxtOutput")
+    .textContent =
         "尚無輸出";
 
-    document
-        .getElementById("jsonTxtDownload")
-        .disabled = true;
+    $("jsonTxtDownload")
+    .disabled = true;
 
-    document
-        .getElementById("jsonTxtCopy")
-        .disabled = true;
+    $("jsonTxtCopy")
+    .disabled = true;
 
-    document
-        .getElementById("jsonTxtStatus")
-        .textContent =
+    $("jsonTxtStatus")
+    .textContent =
         "已清除";
 
     renderJsonGroups(
@@ -2956,28 +3223,32 @@ document
    JSON EDIT FILE
 ===================================================== */
 
-document
-.getElementById("jsonEditFile")
+$("jsonEditFile")
 .addEventListener("change", function() {
 
     const file = this.files[0];
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
 
-    const reader = new FileReader();
+    const reader =
+        new FileReader();
 
     reader.onload = function(e) {
 
-        document
-            .getElementById("jsonEditInput")
-            .value =
+        $("jsonEditInput")
+        .value =
             e.target.result;
 
         parseJsonEditor();
 
     };
 
-    reader.readAsText(file, "UTF-8");
+    reader.readAsText(
+        file,
+        "UTF-8"
+    );
 
 });
 
@@ -2989,10 +3260,10 @@ document
 function parseJsonEditor() {
 
     const text =
-        document
-            .getElementById("jsonEditInput")
-            .value
-            .trim();
+        $("jsonEditInput")
+        .value
+        .trim();
+
 
     if (!text) {
 
@@ -3008,6 +3279,7 @@ function parseJsonEditor() {
         const obj =
             JSON.parse(text);
 
+
         if (
             !obj ||
             typeof obj !== "object" ||
@@ -3020,25 +3292,32 @@ function parseJsonEditor() {
 
         }
 
+
         jsonGroups =
             objectToJsonGroups(obj);
+
 
         renderJsonGroups(
             "jsonEditTable",
             "jsonEditCount"
         );
 
-        const total =
+
+        const count =
             jsonGroups.reduce(
-                (sum, group) =>
-                    sum + group.points.length,
+                function(sum, group) {
+
+                    return sum +
+                        group.points.length;
+
+                },
                 0
             );
 
-        document
-            .getElementById("jsonEditStatus")
-            .textContent =
-            `解析完成：${jsonGroups.length} 個群組，共 ${total} 個座標`;
+
+        $("jsonEditStatus")
+        .textContent =
+            `解析完成：${jsonGroups.length} 個群組，共 ${count} 個座標`;
 
     }
     catch(error) {
@@ -3053,8 +3332,7 @@ function parseJsonEditor() {
 }
 
 
-document
-.getElementById("jsonParseButton")
+$("jsonParseButton")
 .addEventListener(
     "click",
     parseJsonEditor
@@ -3065,8 +3343,7 @@ document
    JSON EDIT ADD GROUP
 ===================================================== */
 
-document
-.getElementById("jsonEditAddGroup")
+$("jsonEditAddGroup")
 .addEventListener("click", function() {
 
     addJsonGroup();
@@ -3083,18 +3360,21 @@ document
    JSON EDIT ADD POINT
 ===================================================== */
 
-document
-.getElementById("jsonEditAddPoint")
+$("jsonEditAddPoint")
 .addEventListener("click", function() {
 
     if (!jsonGroups.length) {
+
         addJsonGroup();
+
     }
+
 
     const group =
         jsonGroups[
             jsonGroups.length - 1
         ];
+
 
     group.points.push({
 
@@ -3108,6 +3388,7 @@ document
 
     });
 
+
     renderJsonGroups(
         "jsonEditTable",
         "jsonEditCount"
@@ -3120,8 +3401,7 @@ document
    JSON EDIT AUTO NAME
 ===================================================== */
 
-document
-.getElementById("jsonEditAutoName")
+$("jsonEditAutoName")
 .addEventListener("click", function() {
 
     autoNameJson();
@@ -3138,62 +3418,71 @@ document
    JSON EDIT GENERATE
 ===================================================== */
 
-document
-.getElementById("jsonEditGenerate")
+$("jsonEditGenerate")
 .addEventListener("click", function() {
 
     if (!validateJsonGroups()) {
+
         return;
+
     }
+
 
     generatedJsonEdit =
         createJsonFromGroups();
 
-    document
-        .getElementById("jsonEditOutput")
-        .textContent =
+
+    $("jsonEditOutput")
+    .textContent =
         generatedJsonEdit;
 
-    document
-        .getElementById("jsonEditDownload")
-        .disabled = false;
 
-    document
-        .getElementById("jsonEditCopy")
-        .disabled = false;
+    $("jsonEditDownload")
+    .disabled = false;
 
-    document
-        .getElementById("jsonEditStatus")
-        .textContent =
-        "JSON 生成完成";
+
+    $("jsonEditCopy")
+    .disabled = false;
+
+
+    $("jsonEditStatus")
+    .textContent =
+        "JSON 生成完成，檔名：" +
+        getJsonFilename();
 
 });
 
 
-document
-.getElementById("jsonEditDownload")
+/* =====================================================
+   JSON EDIT DOWNLOAD
+===================================================== */
+
+$("jsonEditDownload")
 .addEventListener("click", function() {
 
     downloadText(
         generatedJsonEdit,
-        "edited_coordinates.json",
+        getJsonFilename(),
         "application/json"
     );
 
 });
 
 
-document
-.getElementById("jsonEditCopy")
+$("jsonEditCopy")
 .addEventListener("click", async function() {
 
     const ok =
-        await copyText(generatedJsonEdit);
+        await copyText(
+            generatedJsonEdit
+        );
 
-    document
-        .getElementById("jsonEditStatus")
-        .textContent =
-        ok ? "JSON 已複製" : "複製失敗";
+
+    $("jsonEditStatus")
+    .textContent =
+        ok
+            ? "JSON 已複製"
+            : "複製失敗";
 
 });
 
@@ -3202,34 +3491,28 @@ document
    JSON EDIT CLEAR
 ===================================================== */
 
-document
-.getElementById("jsonEditClear")
+$("jsonEditClear")
 .addEventListener("click", function() {
 
     jsonGroups = [];
 
     generatedJsonEdit = "";
 
-    document
-        .getElementById("jsonEditInput")
-        .value = "";
+    $("jsonEditInput")
+    .value = "";
 
-    document
-        .getElementById("jsonEditOutput")
-        .textContent =
+    $("jsonEditOutput")
+    .textContent =
         "尚無輸出";
 
-    document
-        .getElementById("jsonEditDownload")
-        .disabled = true;
+    $("jsonEditDownload")
+    .disabled = true;
 
-    document
-        .getElementById("jsonEditCopy")
-        .disabled = true;
+    $("jsonEditCopy")
+    .disabled = true;
 
-    document
-        .getElementById("jsonEditStatus")
-        .textContent =
+    $("jsonEditStatus")
+    .textContent =
         "已清除";
 
     renderJsonGroups(
@@ -3239,22 +3522,6 @@ document
 
 });
 
-
-/* =====================================================
-   INIT
-===================================================== */
-
-renderGpxEditor();
-
-renderJsonGroups(
-    "jsonTxtTable",
-    "jsonTxtCount"
-);
-
-renderJsonGroups(
-    "jsonEditTable",
-    "jsonEditCount"
-);
 
 </script>
 
